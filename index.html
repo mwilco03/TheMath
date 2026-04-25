@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quick Tip — the mirror &amp; slide trick</title>
+<style>
+  :root{
+    --bg:#0f1226;
+    --panel:#171a35;
+    --ink:#eaecff;
+    --muted:#9aa3d6;
+    --accent:#7ee787;
+    --accent2:#ffd166;
+    --accent3:#8ab4ff;
+    --line:#2a2f5a;
+    --cell:#1f2447;
+    --cell-shift:#243059;
+    --cell-sum:#2a4732;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  main{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  h1{margin:0 0 6px;font-weight:700;letter-spacing:.2px}
+  p.lede{color:var(--muted);margin:0 0 22px}
+  .panel{background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:22px;margin:18px 0}
+  label{display:block;color:var(--muted);font-size:.92rem;margin-bottom:8px}
+  .input-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  input[type="number"]{
+    background:#0a0d22;color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;font-size:1.25rem;width:200px;
+    font-variant-numeric:tabular-nums}
+  input[type="number"]:focus{outline:2px solid var(--accent3);border-color:transparent}
+  .chip{
+    background:#0a0d22;border:1px solid var(--line);border-radius:999px;
+    padding:8px 12px;color:var(--muted);font-size:.9rem}
+  .chip b{color:var(--ink)}
+  /* Grid */
+  .grid-wrap{overflow-x:auto;padding:6px 2px}
+  .grid{
+    display:grid;grid-auto-flow:column;grid-auto-columns:48px;
+    gap:6px;align-items:center;justify-content:start;
+    font-variant-numeric:tabular-nums;
+  }
+  .row{display:contents}
+  .label-cell{
+    grid-column:1;grid-row:auto;color:var(--muted);font-size:.82rem;
+    padding-right:10px;text-align:right;min-width:170px;white-space:nowrap}
+  .cell{
+    height:54px;display:flex;align-items:center;justify-content:center;
+    background:var(--cell);border:1px solid var(--line);border-radius:10px;
+    font-size:1.6rem;font-weight:600}
+  .cell.empty{background:transparent;border-style:dashed;color:var(--muted);font-weight:400}
+  .cell.dot{background:transparent;border:none;color:var(--accent2);font-size:1.8rem}
+  .cell.shift{background:var(--cell-shift);border-color:#3a4787;color:var(--accent3)}
+  .cell.sum{background:var(--cell-sum);border-color:#3e6a48;color:var(--accent)}
+  .op{
+    height:54px;display:flex;align-items:center;justify-content:center;
+    color:var(--accent2);font-size:1.6rem;font-weight:700}
+  .op.plus{color:var(--accent)}
+  .op.eq{color:var(--accent3)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:.92rem}
+  .legend span b{color:var(--ink)}
+  .arrow-row{
+    display:flex;align-items:center;gap:10px;margin:6px 0 0 180px;
+    color:var(--accent2);font-size:.95rem}
+  .arrow-row svg{flex:0 0 auto}
+  .totals{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px;margin-top:14px}
+  .total-card{
+    background:#0a0d22;border:1px solid var(--line);border-radius:12px;
+    padding:14px}
+  .total-card h3{margin:0 0 4px;font-size:.85rem;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .total-card .val{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .total-card.t10 .val{color:var(--accent3)}
+  .total-card.t20 .val{color:var(--accent)}
+  .total-card.t15 .val{color:var(--accent2)}
+  .total-card.grand .val{color:var(--ink)}
+  details{margin-top:18px;color:var(--muted)}
+  details summary{cursor:pointer;color:var(--ink)}
+  footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:30px}
+  a{color:var(--accent3)}
+  @media (max-width:640px){
+    .label-cell{min-width:120px;font-size:.75rem}
+    .arrow-row{margin-left:130px}
+    .grid{grid-auto-columns:40px}
+    .cell,.op{height:46px;font-size:1.35rem}
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quick Tip — the mirror &amp; slide trick</h1>
+  <p class="lede">
+    Drop the bill into the grid. Mirror it down a row, slide it right by one cell
+    (that's <b>×&nbsp;0.1</b> — your 10%). Mirror that row again and add the two:
+    you've got the 20% tip with grade-school arithmetic.
+  </p>
+
+  <section class="panel">
+    <label for="bill">Bill total</label>
+    <div class="input-row">
+      <input id="bill" type="number" inputmode="decimal" step="0.01" min="0"
+             value="48.50" aria-label="Bill total in dollars" />
+      <span class="chip">Try: <b>23.40</b>, <b>112.75</b>, <b>9.99</b></span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="grid-wrap">
+      <div id="grid" class="grid" role="table" aria-label="Tip calculation grid"></div>
+    </div>
+
+    <div class="legend">
+      <span><b style="color:var(--accent2)">·</b> decimal point</span>
+      <span><b style="color:var(--accent3)">cell</b> shifted (×0.1 → 10%)</span>
+      <span><b style="color:var(--accent)">+ / =</b> add the mirrored rows</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="totals">
+      <div class="total-card t10">
+        <h3>10% — slide once</h3><div class="val" id="v10">$4.85</div>
+      </div>
+      <div class="total-card t20">
+        <h3>20% — mirror &amp; add</h3><div class="val" id="v20">$9.70</div>
+      </div>
+      <div class="total-card t15">
+        <h3>15% — average of bill rows</h3><div class="val" id="v15">$7.28</div>
+      </div>
+      <div class="total-card grand">
+        <h3>Total + 20% tip</h3><div class="val" id="vGrand">$58.20</div>
+      </div>
+    </div>
+
+    <details>
+      <summary>Why this works</summary>
+      <p>
+        Multiplying by 10 shifts every digit one column to the <em>left</em>.
+        Multiplying by <b>0.1</b> shifts every digit one column to the <em>right</em>
+        — that's exactly what 10% of a number looks like. To get 20%, mirror that
+        10% row and add the two; column-by-column addition gives the tip without a
+        calculator. For 15%, take the halfway point between the 10% row and the 20% row.
+      </p>
+    </details>
+  </section>
+
+  <footer>
+    Built as a single static page — open <code>index.html</code> or serve via GitHub Pages.
+  </footer>
+</main>
+
+<script>
+(function(){
+  const billEl = document.getElementById('bill');
+  const grid   = document.getElementById('grid');
+  const v10    = document.getElementById('v10');
+  const v20    = document.getElementById('v20');
+  const v15    = document.getElementById('v15');
+  const vGrand = document.getElementById('vGrand');
+
+  // Format currency with two decimals.
+  const money = n => '$' + (Math.round(n*100)/100).toFixed(2);
+
+  // Break a non-negative number into digit slots aligned around a fixed
+  // decimal column. We always render two decimal places.
+  // Returns { intDigits: [...], decDigits: [d,d] }
+  function digitize(n){
+    if (!isFinite(n) || n < 0) n = 0;
+    const fixed = (Math.round(n*100)/100).toFixed(2);
+    const [intPart, decPart] = fixed.split('.');
+    return {
+      intDigits: intPart.split(''),
+      decDigits: decPart.split('')
+    };
+  }
+
+  // Build a row of cells aligned to a shared column layout.
+  // columns: array of column descriptors
+  //   { type:'digit'|'dot', d?:string }
+  // We render cells across `colCount` columns; missing entries are empty cells.
+  function makeRow(label, cells, opts={}){
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'label-cell';
+    labelDiv.textContent = label;
+    grid.appendChild(labelDiv);
+    cells.forEach(c => {
+      const el = document.createElement('div');
+      if (c.type === 'dot'){
+        el.className = 'cell dot';
+        el.textContent = '·';
+      } else if (c.type === 'op'){
+        el.className = 'op ' + (c.cls||'');
+        el.textContent = c.sym;
+      } else if (c.type === 'empty'){
+        el.className = 'cell empty';
+        el.textContent = '';
+      } else {
+        el.className = 'cell' + (opts.shift ? ' shift':'') + (opts.sum ? ' sum':'');
+        el.textContent = c.d;
+      }
+      grid.appendChild(el);
+    });
+  }
+
+  // Render the full calculation grid for the given bill amount.
+  function render(){
+    const bill = parseFloat(billEl.value);
+    const safe = isFinite(bill) && bill >= 0 ? bill : 0;
+
+    // Layout columns: we need enough integer columns to fit (bill) and
+    // (bill * 1.2) — the 10% shift adds one integer column on the left.
+    const billDig = digitize(safe);
+    const tenDig  = digitize(safe * 0.1);
+    const twentyDig = digitize(safe * 0.2);
+
+    // Determine total integer-column width (max int length across rows).
+    const intWidth = Math.max(billDig.intDigits.length,
+                              tenDig.intDigits.length,
+                              twentyDig.intDigits.length,
+                              1);
+
+    // Helper: produce cells for a row given its digit object,
+    // padded to intWidth integer columns + dot + 2 decimal columns.
+    function rowCells(dig){
+      const cells = [];
+      const pad = intWidth - dig.intDigits.length;
+      for (let i=0;i<pad;i++) cells.push({type:'empty'});
+      dig.intDigits.forEach(d => cells.push({type:'digit', d}));
+      cells.push({type:'dot'});
+      dig.decDigits.forEach(d => cells.push({type:'digit', d}));
+      return cells;
+    }
+
+    // Set column count on the grid.
+    const colCount = intWidth + 1 /*dot*/ + 2 /*decimals*/ + 1 /*op col*/;
+    grid.style.gridTemplateColumns =
+      `170px repeat(${colCount-1}, 48px)`;
+
+    // Clear and build.
+    grid.innerHTML = '';
+
+    // Row 1 — Bill total.
+    makeRow('Bill total', [
+      ...rowCells(billDig),
+      {type:'op', sym:'', cls:''}
+    ]);
+
+    // Row 2 — Mirror of bill, slid right by one column (×0.1 → 10%).
+    makeRow('Mirror, slide → ×0.1  (10%)',
+      rowCells(tenDig).concat([{type:'op', sym:'', cls:''}]),
+      {shift:true});
+
+    // Row 3 — Mirror of the 10% row (same value).
+    makeRow('Mirror it again  (10%)',
+      rowCells(tenDig).concat([{type:'op', sym:'+', cls:'plus'}]),
+      {shift:true});
+
+    // Row 4 — Sum: add the two 10% rows column by column → 20% tip.
+    makeRow('Add the rows  =  20% tip',
+      rowCells(twentyDig).concat([{type:'op', sym:'=', cls:'eq'}]),
+      {sum:true});
+
+    // Update totals.
+    const tip10 = safe * 0.10;
+    const tip20 = safe * 0.20;
+    const tip15 = (tip10 + tip20) / 2;
+    v10.textContent    = money(tip10);
+    v20.textContent    = money(tip20);
+    v15.textContent    = money(tip15);
+    vGrand.textContent = money(safe + tip20);
+  }
+
+  billEl.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -56,6 +56,22 @@
     font-size:.74rem;letter-spacing:.16em;text-transform:uppercase}
   .step-break::before, .step-break::after{
     content:"";flex:1;height:1px;background:var(--line)}
+
+  /* Carry row — small selects above the addends so a student can write
+     down what they carried, column by column.  No math attached. */
+  .carry-row .cells{align-items:center}
+  .carry-cell{
+    width:var(--cell-w);height:30px;
+    background:transparent;border:1px dashed var(--line);border-radius:6px;
+    color:var(--accent2);font-size:.95rem;font-weight:700;
+    text-align:center;text-align-last:center;padding:0;flex-shrink:0;
+    appearance:none;-webkit-appearance:none;
+    cursor:pointer;font-variant-numeric:tabular-nums}
+  .carry-cell:focus{outline:1px solid var(--accent3);border-style:solid}
+  .carry-cell:has(option:checked:not([value=""])){
+    border-style:solid;border-color:var(--accent2);background:#1a1d3a}
+  .carry-cell.spacer{
+    width:10px;border:none;background:transparent;pointer-events:none}
   .cells{display:flex;gap:var(--gap);align-items:center;flex:1;justify-content:flex-start}
   .cell{
     width:var(--cell-w);height:var(--cell-h);
@@ -139,6 +155,13 @@
       <!-- Phase break: clear visual cue that the user now slides the decimal -->
       <div class="step-break" aria-hidden="true">
         <span>move the decimal now</span>
+      </div>
+
+      <!-- Carry row: blank-by-default 1–9 selects, one per column.  Pure
+           memory aid for the addition below; nothing reads these values. -->
+      <div class="row carry-row" aria-label="Carry markers (optional)">
+        <div class="lhs-op">&nbsp;</div>
+        <div class="cells" id="cells-carry"></div>
       </div>
 
       <!-- Row 2: shifted (10%) — slide control sits at row's end -->
@@ -366,6 +389,31 @@
     if (e.key === 'ArrowRight'){ shift -= 1; clearVerdict(); render(); e.preventDefault(); }
     if (e.key === 'Enter'){ document.getElementById('check').click(); }
   });
+
+  // ---- Carry row (one-time build) -----------------------------------
+  // Column-aligned with the addends below; blank by default.  Nothing in
+  // the rest of the script reads these — they're pure memory aids.
+  function makeCarrySelect(){
+    const sel = document.createElement('select');
+    sel.className = 'carry-cell';
+    const blank = document.createElement('option');
+    blank.value = ''; blank.textContent = '';
+    sel.appendChild(blank);
+    for (let n=1; n<=9; n++){
+      const opt = document.createElement('option');
+      opt.value = String(n); opt.textContent = String(n);
+      sel.appendChild(opt);
+    }
+    return sel;
+  }
+  (function buildCarryRow(){
+    const host = document.getElementById('cells-carry');
+    for (let i=0; i<INT_SLOTS; i++) host.appendChild(makeCarrySelect());
+    const dot = document.createElement('div');
+    dot.className = 'carry-cell spacer';
+    host.appendChild(dot);
+    for (let i=0; i<DEC_SLOTS; i++) host.appendChild(makeCarrySelect());
+  })();
 
   render();
 })();

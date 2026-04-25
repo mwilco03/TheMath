@@ -14,80 +14,92 @@
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  main{max-width:880px;margin:0 auto;padding:28px 16px 80px}
-  h1{margin:0 0 4px}
-  p.lede{color:var(--muted);margin:0 0 18px}
+  /* Mobile-first fluid sizing.  Cell width scales with viewport so the
+     entire row always fits on screen without horizontal scrolling. */
+  :root{
+    --cell-w: clamp(26px, 8.4vw, 46px);
+    --cell-h: clamp(40px, 11vw, 56px);
+    --cell-fs: clamp(1.05rem, 4.4vw, 1.55rem);
+  }
+  main{max-width:880px;margin:0 auto;padding:18px 12px 80px}
+  h1{margin:0 0 4px;font-size:clamp(1.25rem,5vw,1.7rem)}
+  p.lede{color:var(--muted);margin:0 0 14px;font-size:.95rem}
   .panel{background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:20px;margin:14px 0}
-  .row{
-    display:flex;align-items:center;gap:6px;margin:10px 0;
-    font-variant-numeric:tabular-nums}
-  .row-label{
-    width:120px;color:var(--muted);font-size:.85rem;text-align:right;
-    padding-right:10px;flex-shrink:0}
+    border-radius:14px;padding:14px;margin:12px 0}
+  /* Each calc row: label sits ABOVE the cells on phones; beside on desktop. */
+  .row{margin:10px 0;font-variant-numeric:tabular-nums}
+  .row-head{display:flex;justify-content:space-between;align-items:baseline;
+    color:var(--muted);font-size:.78rem;margin:0 2px 4px;gap:8px}
+  .row-head .lbl{flex:1;text-align:left}
+  .row-head .tag{font-variant-numeric:tabular-nums}
+  .row-head .tag.bad{color:var(--bad)}
+  .row-body{display:flex;align-items:center;gap:4px;min-width:0}
   .lhs-op{
-    width:28px;text-align:center;font-size:1.5rem;font-weight:700;
+    width:18px;text-align:center;font-size:1.4rem;font-weight:700;
     color:var(--accent2);flex-shrink:0}
   .lhs-op.plus{color:var(--accent)}
   .lhs-op.eq{color:var(--accent3)}
-  .cells{display:flex;gap:5px;align-items:center}
+  .cells{display:flex;gap:3px;align-items:center;flex:1;min-width:0;
+    justify-content:flex-start}
   .cell{
-    width:46px;height:54px;display:flex;align-items:center;justify-content:center;
-    background:var(--cell);border:1px solid var(--line);border-radius:9px;
-    font-size:1.55rem;font-weight:600;transition:background .15s,border-color .15s,color .15s}
+    width:var(--cell-w);height:var(--cell-h);
+    display:flex;align-items:center;justify-content:center;
+    background:var(--cell);border:1px solid var(--line);border-radius:8px;
+    font-size:var(--cell-fs);font-weight:600;flex-shrink:0;
+    transition:background .15s,border-color .15s,color .15s}
   .cell.empty{background:transparent;border-style:dashed;color:var(--muted);font-weight:400}
   .cell.dot{
-    width:14px;background:transparent;border:none;color:var(--accent2);
-    font-size:1.9rem;font-weight:700}
+    width:10px;background:transparent;border:none;color:var(--accent2);
+    font-size:calc(var(--cell-fs) * 1.1);font-weight:700}
   .cell.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
   .cell.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
-  .row.active .cells .cell:not(.dot){box-shadow:0 0 0 2px rgba(138,180,255,.25) inset}
+  .row.active .cells .cell:not(.dot){box-shadow:0 0 0 2px rgba(138,180,255,.35) inset}
   .row.selectable{cursor:pointer}
-  .shift-btns{display:flex;gap:6px;margin-left:10px}
+  /* Shift buttons sit on their own line under row 2 — easier thumb targets. */
+  .shift-btns{
+    display:flex;gap:8px;margin:8px 0 0;justify-content:center}
   .shift-btns button{
-    width:42px;height:42px;border-radius:8px;border:1px solid var(--line);
-    background:#0a0d22;color:var(--ink);font-size:1.1rem;cursor:pointer;
-    display:flex;align-items:center;justify-content:center}
-  .shift-btns button:hover{border-color:var(--accent3)}
-  .shift-btns button:active{transform:translateY(1px)}
-  .shift-tag{
-    margin-left:10px;font-size:.8rem;color:var(--muted);
-    font-variant-numeric:tabular-nums}
-  .shift-tag.bad{color:var(--bad)}
+    flex:1;max-width:140px;height:44px;border-radius:10px;
+    border:1px solid var(--line);background:#0a0d22;color:var(--ink);
+    font-size:1.2rem;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px}
+  .shift-btns button:active{transform:translateY(1px);background:#161b3e}
+  .divider{height:2px;background:var(--line);margin:6px 0}
   .keypad{
     display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-    max-width:300px;margin-top:6px}
+    width:100%;max-width:360px;margin:14px auto 0}
   .keypad button{
     height:54px;border-radius:10px;border:1px solid var(--line);
     background:#0a0d22;color:var(--ink);font-size:1.3rem;font-weight:600;
     cursor:pointer}
   .keypad button.util{color:var(--accent2);font-size:1rem}
-  .keypad button:hover{border-color:var(--accent3)}
-  .keypad button:active{transform:translateY(1px)}
-  .target-pick{display:flex;gap:8px;margin:10px 0 0;color:var(--muted);font-size:.9rem}
+  .keypad button:active{transform:translateY(1px);background:#161b3e}
+  .target-pick{display:flex;gap:8px;margin:8px 0 0;color:var(--muted);
+    font-size:.85rem;align-items:center;flex-wrap:wrap}
   .target-pick button{
     border:1px solid var(--line);background:#0a0d22;color:var(--ink);
     border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
   .target-pick button.on{background:var(--accent3);color:#000;border-color:var(--accent3)}
   .actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
   .check{
-    background:var(--accent3);color:#000;border:none;border-radius:10px;
-    padding:14px 22px;font-size:1.05rem;font-weight:700;cursor:pointer}
-  .check:hover{filter:brightness(1.05)}
+    flex:1;min-width:140px;background:var(--accent3);color:#000;border:none;
+    border-radius:10px;padding:14px 22px;font-size:1.05rem;font-weight:700;
+    cursor:pointer}
   .reset{
     background:transparent;color:var(--muted);border:1px solid var(--line);
     border-radius:10px;padding:14px 18px;font-weight:600;cursor:pointer}
   .verdict{
     margin-top:12px;padding:12px 14px;border-radius:10px;font-weight:600;
-    display:none}
+    display:none;font-size:.95rem}
   .verdict.show{display:block}
   .verdict.ok{background:var(--good-bg);border:1px solid var(--good);color:var(--good)}
   .verdict.no{background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
-  .hint{color:var(--muted);font-size:.85rem;margin-top:8px}
-  @media (max-width:640px){
-    .row-label{width:90px;font-size:.75rem}
-    .cell{width:38px;height:46px;font-size:1.25rem}
-    .cell.dot{width:12px;font-size:1.5rem}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px;line-height:1.4}
+  @media (min-width:720px){
+    main{padding:28px 20px 80px}
+    .panel{padding:20px}
+    .row-head{font-size:.85rem}
+    .lhs-op{width:28px;font-size:1.5rem}
   }
 </style>
 </head>
@@ -102,44 +114,47 @@
   <section class="panel">
     <!-- Row 1: Bill total (user types) -->
     <div class="row selectable active" id="row-bill" data-target="bill">
-      <div class="row-label">Place total here</div>
-      <div class="lhs-op">&nbsp;</div>
-      <div class="cells" id="cells-bill"></div>
+      <div class="row-head"><span class="lbl">Place total here</span></div>
+      <div class="row-body">
+        <div class="lhs-op">&nbsp;</div>
+        <div class="cells" id="cells-bill"></div>
+      </div>
     </div>
 
-    <!-- Row 2: Mirror with shift buttons -->
+    <!-- Row 2: Mirror with shift buttons below -->
     <div class="row" id="row-shift">
-      <div class="row-label">Mirror &amp; slide</div>
-      <div class="lhs-op">&nbsp;</div>
-      <div class="cells" id="cells-shift"></div>
-      <div class="shift-btns">
-        <button id="btn-left"  title="Slide decimal left  (×0.1)">←</button>
-        <button id="btn-right" title="Slide decimal right (×10)">→</button>
+      <div class="row-head">
+        <span class="lbl">Mirror &amp; slide the decimal</span>
+        <span class="tag" id="shift-tag">×1</span>
       </div>
-      <div class="shift-tag" id="shift-tag">×1</div>
+      <div class="row-body">
+        <div class="lhs-op">&nbsp;</div>
+        <div class="cells" id="cells-shift"></div>
+      </div>
+      <div class="shift-btns">
+        <button id="btn-left"  aria-label="Slide decimal left">← slide</button>
+        <button id="btn-right" aria-label="Slide decimal right">slide →</button>
+      </div>
     </div>
 
     <!-- Row 3: + and another mirror of row 2 -->
     <div class="row" id="row-mirror">
-      <div class="row-label">Mirror it again</div>
-      <div class="lhs-op plus">+</div>
-      <div class="cells" id="cells-mirror"></div>
-    </div>
-
-    <!-- divider -->
-    <div class="row" aria-hidden="true">
-      <div class="row-label">&nbsp;</div>
-      <div class="lhs-op">&nbsp;</div>
-      <div class="cells">
-        <div style="height:2px;background:var(--line);width:100%;min-width:260px"></div>
+      <div class="row-head"><span class="lbl">Mirror it again</span></div>
+      <div class="row-body">
+        <div class="lhs-op plus">+</div>
+        <div class="cells" id="cells-mirror"></div>
       </div>
     </div>
 
+    <div class="divider" aria-hidden="true"></div>
+
     <!-- Row 4: User result -->
     <div class="row selectable" id="row-result" data-target="result">
-      <div class="row-label">Your answer</div>
-      <div class="lhs-op eq">=</div>
-      <div class="cells" id="cells-result"></div>
+      <div class="row-head"><span class="lbl">Your answer (the sum)</span></div>
+      <div class="row-body">
+        <div class="lhs-op eq">=</div>
+        <div class="cells" id="cells-result"></div>
+      </div>
     </div>
 
     <div class="target-pick">

@@ -8,39 +8,41 @@
   :root{
     --bg:#0f1226; --panel:#171a35; --ink:#eaecff; --muted:#9aa3d6;
     --accent:#7ee787; --accent2:#ffd166; --accent3:#8ab4ff;
-    --line:#2a2f5a; --cell:#1f2447; --cell-active:#293063;
+    --line:#2a2f5a; --cell:#1f2447;
     --bad:#ff6b6b; --bad-bg:#3a1a1f; --good:#7ee787; --good-bg:#1a3a22;
+    --cell-w: clamp(28px, 9vw, 48px);
+    --cell-h: clamp(40px, 11vw, 56px);
+    --cell-fs: clamp(1.1rem, 4.6vw, 1.6rem);
+    --gap: clamp(2px, 0.8vw, 6px);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  /* Mobile-first fluid sizing.  Cell width scales with viewport so the
-     entire row always fits on screen without horizontal scrolling. */
-  :root{
-    --cell-w: clamp(26px, 8.4vw, 46px);
-    --cell-h: clamp(40px, 11vw, 56px);
-    --cell-fs: clamp(1.05rem, 4.4vw, 1.55rem);
-  }
-  main{max-width:880px;margin:0 auto;padding:18px 12px 80px}
+  main{max-width:720px;margin:0 auto;padding:18px 12px 60px}
   h1{margin:0 0 4px;font-size:clamp(1.25rem,5vw,1.7rem)}
-  p.lede{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+  p.lede{color:var(--muted);margin:0 0 14px;font-size:.92rem;line-height:1.4}
   .panel{background:var(--panel);border:1px solid var(--line);
     border-radius:14px;padding:14px;margin:12px 0}
-  /* Each calc row: label sits ABOVE the cells on phones; beside on desktop. */
-  .row{margin:10px 0;font-variant-numeric:tabular-nums}
-  .row-head{display:flex;justify-content:space-between;align-items:baseline;
-    color:var(--muted);font-size:.78rem;margin:0 2px 4px;gap:8px}
-  .row-head .lbl{flex:1;text-align:left}
-  .row-head .tag{font-variant-numeric:tabular-nums}
-  .row-head .tag.bad{color:var(--bad)}
-  .row-body{display:flex;align-items:center;gap:4px;min-width:0}
+  .field{display:flex;flex-direction:column;gap:6px;margin:0 0 10px}
+  .field label{color:var(--muted);font-size:.82rem}
+  .field input{
+    background:#0a0d22;color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;font-size:1.2rem;
+    font-variant-numeric:tabular-nums;width:100%}
+  .field input:focus{outline:2px solid var(--accent3);border-color:transparent}
+
+  /* Stack — rows of cells, column-aligned, no extra controls inside the row body. */
+  .stack{display:flex;flex-direction:column;align-items:stretch;
+    gap:var(--gap);margin:8px 0 4px}
+  .row{
+    display:flex;align-items:center;gap:var(--gap);
+    font-variant-numeric:tabular-nums}
   .lhs-op{
-    width:18px;text-align:center;font-size:1.4rem;font-weight:700;
-    color:var(--accent2);flex-shrink:0}
+    width:18px;flex-shrink:0;text-align:center;
+    font-size:1.4rem;font-weight:700;color:var(--accent2)}
   .lhs-op.plus{color:var(--accent)}
   .lhs-op.eq{color:var(--accent3)}
-  .cells{display:flex;gap:3px;align-items:center;flex:1;min-width:0;
-    justify-content:flex-start}
+  .cells{display:flex;gap:var(--gap);align-items:center;flex:1;justify-content:flex-start}
   .cell{
     width:var(--cell-w);height:var(--cell-h);
     display:flex;align-items:center;justify-content:center;
@@ -53,38 +55,28 @@
     font-size:calc(var(--cell-fs) * 1.1);font-weight:700}
   .cell.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
   .cell.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
-  .row.active .cells .cell:not(.dot){box-shadow:0 0 0 2px rgba(138,180,255,.35) inset}
-  .row.selectable{cursor:pointer}
-  /* Shift buttons sit on their own line under row 2 — easier thumb targets. */
-  .shift-btns{
-    display:flex;gap:8px;margin:8px 0 0;justify-content:center}
-  .shift-btns button{
-    flex:1;max-width:140px;height:44px;border-radius:10px;
-    border:1px solid var(--line);background:#0a0d22;color:var(--ink);
-    font-size:1.2rem;font-weight:600;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:6px}
-  .shift-btns button:active{transform:translateY(1px);background:#161b3e}
-  .divider{height:2px;background:var(--line);margin:6px 0}
-  .keypad{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-    width:100%;max-width:360px;margin:14px auto 0}
-  .keypad button{
-    height:54px;border-radius:10px;border:1px solid var(--line);
-    background:#0a0d22;color:var(--ink);font-size:1.3rem;font-weight:600;
-    cursor:pointer}
-  .keypad button.util{color:var(--accent2);font-size:1rem}
-  .keypad button:active{transform:translateY(1px);background:#161b3e}
-  .target-pick{display:flex;gap:8px;margin:8px 0 0;color:var(--muted);
-    font-size:.85rem;align-items:center;flex-wrap:wrap}
-  .target-pick button{
-    border:1px solid var(--line);background:#0a0d22;color:var(--ink);
-    border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
-  .target-pick button.on{background:var(--accent3);color:#000;border-color:var(--accent3)}
+  .divider{height:2px;background:var(--line);margin:2px 0;align-self:stretch}
+
+  /* The slide control sits to the RIGHT of row 2 as a compact pill — small
+     enough not to push row 3 out of column alignment with rows 1/4. */
+  .row.row-shift{position:relative}
+  .slide{
+    display:inline-flex;gap:4px;margin-left:var(--gap);align-items:center;
+    flex-shrink:0}
+  .slide button{
+    width:30px;height:30px;border-radius:6px;border:1px solid var(--line);
+    background:#0a0d22;color:var(--ink);font-size:.95rem;font-weight:700;
+    cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+  .slide button:active{transform:translateY(1px);background:#161b3e}
+  .slide .tag{
+    margin-left:4px;font-size:.72rem;color:var(--muted);
+    font-variant-numeric:tabular-nums;min-width:32px}
+  .slide .tag.bad{color:var(--bad)}
+
   .actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
   .check{
-    flex:1;min-width:140px;background:var(--accent3);color:#000;border:none;
-    border-radius:10px;padding:14px 22px;font-size:1.05rem;font-weight:700;
-    cursor:pointer}
+    flex:1;min-width:130px;background:var(--accent3);color:#000;border:none;
+    border-radius:10px;padding:14px 22px;font-size:1.05rem;font-weight:700;cursor:pointer}
   .reset{
     background:transparent;color:var(--muted);border:1px solid var(--line);
     border-radius:10px;padding:14px 18px;font-weight:600;cursor:pointer}
@@ -94,83 +86,62 @@
   .verdict.show{display:block}
   .verdict.ok{background:var(--good-bg);border:1px solid var(--good);color:var(--good)}
   .verdict.no{background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
-  .hint{color:var(--muted);font-size:.82rem;margin-top:8px;line-height:1.4}
-  @media (min-width:720px){
-    main{padding:28px 20px 80px}
-    .panel{padding:20px}
-    .row-head{font-size:.85rem}
-    .lhs-op{width:28px;font-size:1.5rem}
-  }
+  .hint{color:var(--muted);font-size:.8rem;margin-top:8px;line-height:1.45}
 </style>
 </head>
 <body>
 <main>
-  <h1>Quick Tip — practice grid</h1>
+  <h1>Quick Tip</h1>
   <p class="lede">
-    Type the bill. Slide the decimal to make 10%. Add the two 10% rows yourself.
-    Hit <b>Check</b>.
+    Type the bill. Slide the decimal one place to make 10%. Add the two 10% rows
+    yourself, type your answer, hit <b>Check</b>.
   </p>
 
   <section class="panel">
-    <!-- Row 1: Bill total (user types) -->
-    <div class="row selectable active" id="row-bill" data-target="bill">
-      <div class="row-head"><span class="lbl">Place total here</span></div>
-      <div class="row-body">
+
+    <div class="field">
+      <label for="bill-input">Bill total</label>
+      <input id="bill-input" type="text" inputmode="decimal"
+             autocomplete="off" placeholder="e.g. 50.75" />
+    </div>
+
+    <div class="stack" aria-label="Calculation grid">
+      <!-- Row 1: bill -->
+      <div class="row">
         <div class="lhs-op">&nbsp;</div>
         <div class="cells" id="cells-bill"></div>
       </div>
-    </div>
 
-    <!-- Row 2: Mirror with shift buttons below -->
-    <div class="row" id="row-shift">
-      <div class="row-head">
-        <span class="lbl">Mirror &amp; slide the decimal</span>
-        <span class="tag" id="shift-tag">×1</span>
-      </div>
-      <div class="row-body">
+      <!-- Row 2: shifted (10%) — slide control sits at row's end -->
+      <div class="row row-shift">
         <div class="lhs-op">&nbsp;</div>
         <div class="cells" id="cells-shift"></div>
+        <div class="slide">
+          <button id="btn-left"  aria-label="Slide decimal left">←</button>
+          <button id="btn-right" aria-label="Slide decimal right">→</button>
+          <span class="tag" id="shift-tag">×1</span>
+        </div>
       </div>
-      <div class="shift-btns">
-        <button id="btn-left"  aria-label="Slide decimal left">← slide</button>
-        <button id="btn-right" aria-label="Slide decimal right">slide →</button>
-      </div>
-    </div>
 
-    <!-- Row 3: + and another mirror of row 2 -->
-    <div class="row" id="row-mirror">
-      <div class="row-head"><span class="lbl">Mirror it again</span></div>
-      <div class="row-body">
+      <!-- Row 3: + mirror of row 2 -->
+      <div class="row">
         <div class="lhs-op plus">+</div>
         <div class="cells" id="cells-mirror"></div>
       </div>
-    </div>
 
-    <div class="divider" aria-hidden="true"></div>
+      <div class="divider" aria-hidden="true"></div>
 
-    <!-- Row 4: User result -->
-    <div class="row selectable" id="row-result" data-target="result">
-      <div class="row-head"><span class="lbl">Your answer (the sum)</span></div>
-      <div class="row-body">
+      <!-- Row 4: user answer -->
+      <div class="row">
         <div class="lhs-op eq">=</div>
         <div class="cells" id="cells-result"></div>
       </div>
     </div>
 
-    <div class="target-pick">
-      Typing into:
-      <button class="on" id="pick-bill"   data-target="bill">Bill</button>
-      <button         id="pick-result" data-target="result">Your answer</button>
-    </div>
-
-    <!-- Keypad -->
-    <div class="keypad" aria-label="Number pad">
-      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
-      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
-      <button class="util" data-k="back">⌫</button>
-      <button data-k="0">0</button>
-      <button class="util" data-k="clear">CLR</button>
+    <div class="field" style="margin-top:10px">
+      <label for="answer-input">Your answer (the sum of the two rows above)</label>
+      <input id="answer-input" type="text" inputmode="decimal"
+             autocomplete="off" placeholder="e.g. 10.15" />
     </div>
 
     <div class="actions">
@@ -180,90 +151,73 @@
 
     <div class="verdict" id="verdict"></div>
     <div class="hint">
-      Tip: one press of <b>←</b> shifts the decimal one place — that's 10% of the
-      bill. Add the two 10% rows together to get a 20% tip.
+      One <b>←</b> press = decimal moves one place left = 10% of the bill.
+      Two 10% rows added together = a 20% tip.
     </div>
   </section>
 </main>
 
 <script>
 (function(){
-  // ---- State ----------------------------------------------------------
-  // Bill is stored as an integer count of cents being entered right-to-left.
-  // billCents = digits typed, treated as the number * 100.
-  // shift = how many places the decimal has been moved LEFT from its
-  // natural position in row 2. shift > 1 (or < 0) is "too many" -> red.
-  // resultCents = user's answer for row 4, also right-to-left entry.
-  let billCents   = 0;     // raw entered digits, max 9 digits
-  let resultCents = 0;     // raw entered digits, max 9 digits
-  let shift       = 0;     // 0 = identical to bill; 1 = ×0.1 (10%)
-  let target      = 'bill';// which row receives keypad input
+  // ---- State ---------------------------------------------------------
+  // Bill is held as integer cents to avoid floating point drift.
+  // shift = how many places the decimal has been moved LEFT in row 2.
+  //   shift === 1 is the "useful" position (10% of bill);
+  //   anything else flags the row red but still calculates.
+  let billCents = 0;
+  let answerCents = 0;
+  let shift = 0;
 
-  const MAX_DIGITS = 9;    // total digits entered (incl. cents)
-  const INT_SLOTS  = 5;    // visible integer cells
-  const DEC_SLOTS  = 4;    // visible decimal cells (room for shifts)
+  const INT_SLOTS = 5;   // visible integer cells (room to grow)
+  const DEC_SLOTS = 4;   // visible decimal cells (room for shifts)
 
-  // ---- DOM refs -------------------------------------------------------
+  // ---- DOM -----------------------------------------------------------
+  const billInput   = document.getElementById('bill-input');
+  const answerInput = document.getElementById('answer-input');
   const cellsBill   = document.getElementById('cells-bill');
   const cellsShift  = document.getElementById('cells-shift');
   const cellsMirror = document.getElementById('cells-mirror');
   const cellsResult = document.getElementById('cells-result');
   const shiftTag    = document.getElementById('shift-tag');
   const verdict     = document.getElementById('verdict');
-  const rowBill     = document.getElementById('row-bill');
-  const rowResult   = document.getElementById('row-result');
-  const pickBill    = document.getElementById('pick-bill');
-  const pickResult  = document.getElementById('pick-result');
 
-  // ---- Helpers --------------------------------------------------------
-  // Convert a raw digit count (e.g. 5075) into the display digits
-  // distributed across (INT_SLOTS + DEC_SLOTS) cells, with the decimal
-  // point fixed between them.  Cents are the last 2 digits.
+  // ---- Parsing -------------------------------------------------------
+  // Turn a free-form decimal string into integer cents, ignoring junk.
+  function toCents(str){
+    if (!str) return 0;
+    const m = String(str).replace(/[^\d.]/g,'').match(/^(\d*)(?:\.(\d*))?$/);
+    if (!m) return 0;
+    const whole = m[1] || '0';
+    const frac  = (m[2] || '').slice(0,2).padEnd(2,'0');
+    return parseInt(whole, 10) * 100 + parseInt(frac || '0', 10);
+  }
   function digitsFromCents(cents){
-    const s = String(cents).padStart(3, '0'); // at least 1 int digit + 2 dec
-    const dec = s.slice(-2);
-    const int = s.slice(0, -2);
-    return { int, dec };
+    const s = String(cents).padStart(3,'0');
+    return { int: s.slice(0,-2), dec: s.slice(-2) };
   }
 
-  // Render a row of cells.  `int` and `dec` are digit strings.  `decShift`
-  // moves the decimal point that many positions to the LEFT inside this
-  // row's display (positive = ×0.1^n).  `flagBad` marks all digit cells red.
+  // ---- Render --------------------------------------------------------
   function renderRow(host, int, dec, decShift, flagBad){
     host.innerHTML = '';
-
-    // Combine into one digit stream, then re-split based on the shifted
-    // decimal position. The natural decimal sits between int and dec.
-    const all = int + dec;            // e.g. "5075"
-    const naturalPos = int.length;    // index where '.' sits naturally
-    const newPos = Math.max(0, naturalPos - decShift); // shift LEFT
-
+    const all = int + dec;
+    const naturalPos = int.length;
+    const newPos = Math.max(0, naturalPos - decShift);
     const newInt = all.slice(0, newPos);
     const newDec = all.slice(newPos);
 
-    // Pad integer cells to INT_SLOTS on the left (empty cells).
     const intPad = INT_SLOTS - newInt.length;
-    for (let i=0;i<intPad;i++){
-      host.appendChild(makeCell('', true, false));
-    }
-    for (const d of newInt){
-      host.appendChild(makeCell(d, false, flagBad));
-    }
-    // Decimal point.
+    for (let i=0;i<intPad;i++) host.appendChild(makeCell('', true, false));
+    for (const d of newInt) host.appendChild(makeCell(d, false, flagBad));
+
     const dot = document.createElement('div');
     dot.className = 'cell dot';
     dot.textContent = '·';
     host.appendChild(dot);
-    // Decimal cells, padded on the right.
-    for (const d of newDec){
-      host.appendChild(makeCell(d, false, flagBad));
-    }
-    const decPad = DEC_SLOTS - newDec.length;
-    for (let i=0;i<decPad;i++){
-      host.appendChild(makeCell('', true, false));
-    }
-  }
 
+    for (const d of newDec) host.appendChild(makeCell(d, false, flagBad));
+    const decPad = DEC_SLOTS - newDec.length;
+    for (let i=0;i<decPad;i++) host.appendChild(makeCell('', true, false));
+  }
   function makeCell(ch, empty, bad){
     const el = document.createElement('div');
     el.className = 'cell' + (empty ? ' empty' : '') + (bad ? ' bad' : '');
@@ -273,100 +227,48 @@
 
   function render(){
     const bill = digitsFromCents(billCents);
-    const res  = digitsFromCents(resultCents);
+    const ans  = digitsFromCents(answerCents);
 
-    // Row 1 — bill, no shift.
     renderRow(cellsBill, bill.int, bill.dec, 0, false);
-
-    // Row 2 + 3 — same shifted bill. shift==1 is the "right" target;
-    // anything else is flagged red but still calculated.
     const flagBad = (shift !== 1);
     renderRow(cellsShift,  bill.int, bill.dec, shift, flagBad);
     renderRow(cellsMirror, bill.int, bill.dec, shift, flagBad);
+    renderRow(cellsResult, ans.int, ans.dec, 0, false);
 
-    // Row 4 — user's typed answer, no shift.
-    renderRow(cellsResult, res.int, res.dec, 0, false);
-
-    // Shift readout: ×1, ×0.1, ×0.01, ×10, etc.
-    const factor = Math.pow(10, -shift);
     const tag = shift === 0 ? '×1'
-              : shift > 0   ? '×' + (factor === 0.1 ? '0.1' : factor.toFixed(shift))
+              : shift === 1 ? '×0.1'
+              : shift > 0   ? '×' + Math.pow(10, -shift).toFixed(shift)
               :               '×' + Math.pow(10, -shift);
     shiftTag.textContent = tag;
     shiftTag.classList.toggle('bad', flagBad);
-
-    // Active row highlight.
-    rowBill.classList.toggle('active',   target === 'bill');
-    rowResult.classList.toggle('active', target === 'result');
-    pickBill.classList.toggle('on',   target === 'bill');
-    pickResult.classList.toggle('on', target === 'result');
   }
 
-  // ---- Input ----------------------------------------------------------
-  function pushDigit(d){
+  // ---- Input handlers -----------------------------------------------
+  billInput.addEventListener('input', () => {
+    billCents = toCents(billInput.value);
     clearVerdict();
-    if (target === 'bill'){
-      if (String(billCents).length >= MAX_DIGITS) return;
-      billCents = billCents * 10 + d;
-    } else {
-      if (String(resultCents).length >= MAX_DIGITS) return;
-      resultCents = resultCents * 10 + d;
-    }
     render();
-  }
-  function backspace(){
+  });
+  answerInput.addEventListener('input', () => {
+    answerCents = toCents(answerInput.value);
     clearVerdict();
-    if (target === 'bill'){
-      billCents = Math.floor(billCents / 10);
-    } else {
-      resultCents = Math.floor(resultCents / 10);
-    }
     render();
-  }
-  function clearTarget(){
-    clearVerdict();
-    if (target === 'bill'){ billCents = 0; }
-    else { resultCents = 0; }
-    render();
-  }
+  });
 
-  // ---- Shift ----------------------------------------------------------
-  function shiftLeft(){  clearVerdict(); shift += 1; render(); }
-  function shiftRight(){ clearVerdict(); shift -= 1; render(); }
+  document.getElementById('btn-left').addEventListener('click',  () => {
+    shift += 1; clearVerdict(); render();
+  });
+  document.getElementById('btn-right').addEventListener('click', () => {
+    shift -= 1; clearVerdict(); render();
+  });
 
-  // ---- Check ----------------------------------------------------------
-  // Truth: the shifted row's value, doubled.  We compute it in cents to
-  // avoid float drift.  shifted_cents = round(billCents * 10^(-shift)).
+  // ---- Check ---------------------------------------------------------
+  // Truth = sum of the two shifted rows.
+  // shifted_value_in_cents = billCents * 10^(-shift).  Round to nearest cent.
   function expectedCents(){
-    // billCents represents bill * 100.
-    // shifted_value = bill * 10^(-shift)
-    // shifted_value_in_cents = billCents * 10^(-shift)
-    // Doubled (the sum of two mirrored rows) = 2 * shifted_value_in_cents.
-    // We round to nearest cent because shifting can produce sub-cent values
-    // (e.g. shift=2 on $50.75 -> $0.5075 -> $0.51 rounded).
     const shifted = billCents * Math.pow(10, -shift);
     return Math.round(shifted * 2);
   }
-
-  function check(){
-    if (billCents === 0){
-      showVerdict(false, 'Type the bill first.');
-      return;
-    }
-    const want = expectedCents();
-    if (resultCents === want){
-      showVerdict(true, `Correct — ${fmt(want)} is the sum of those two rows.`);
-      flashRow(cellsResult, true);
-    } else {
-      showVerdict(false,
-        `Not yet. The two rows above sum to ${fmt(want)}. ` +
-        (shift !== 1
-          ? 'Hint: one ← press makes the row 10% of the bill — that gives a 20% tip.'
-          : 'Re-add the columns and try again.'));
-      flashRow(cellsResult, false);
-    }
-  }
-
   function fmt(cents){
     const sign = cents < 0 ? '-' : '';
     cents = Math.abs(cents);
@@ -374,61 +276,45 @@
     const frac  = String(cents % 100).padStart(2,'0');
     return `${sign}$${whole}.${frac}`;
   }
-
   function showVerdict(ok, msg){
     verdict.textContent = msg;
     verdict.className = 'verdict show ' + (ok ? 'ok' : 'no');
-  }
-  function clearVerdict(){
-    verdict.className = 'verdict';
-    // Clear good/bad flashes on result cells.
-    [...cellsResult.children].forEach(c => c.classList.remove('good','bad'));
-  }
-  function flashRow(host, ok){
-    [...host.children].forEach(c => {
+    [...cellsResult.children].forEach(c => {
       if (c.classList.contains('dot') || c.classList.contains('empty')) return;
       c.classList.add(ok ? 'good' : 'bad');
     });
   }
-
-  // ---- Reset ----------------------------------------------------------
-  function resetAll(){
-    billCents = 0; resultCents = 0; shift = 0; target = 'bill';
-    clearVerdict();
-    render();
+  function clearVerdict(){
+    verdict.className = 'verdict';
+    [...cellsResult.children].forEach(c => c.classList.remove('good','bad'));
   }
-
-  // ---- Wire up --------------------------------------------------------
-  document.querySelectorAll('.keypad button').forEach(b => {
-    b.addEventListener('click', () => {
-      const k = b.dataset.k;
-      if (k === 'back')  return backspace();
-      if (k === 'clear') return clearTarget();
-      pushDigit(parseInt(k,10));
-    });
+  document.getElementById('check').addEventListener('click', () => {
+    if (billCents === 0) return showVerdict(false, 'Type the bill first.');
+    const want = expectedCents();
+    if (answerCents === want){
+      showVerdict(true, `Correct — those two rows sum to ${fmt(want)}.`);
+    } else {
+      showVerdict(false,
+        `Not yet. The two rows above sum to ${fmt(want)}.` +
+        (shift !== 1 ? ' Hint: one ← press makes a 10% row → 20% tip.' : ''));
+    }
   });
 
-  document.getElementById('btn-left').addEventListener('click',  shiftLeft);
-  document.getElementById('btn-right').addEventListener('click', shiftRight);
-  document.getElementById('check').addEventListener('click', check);
-  document.getElementById('reset').addEventListener('click', resetAll);
+  document.getElementById('reset').addEventListener('click', () => {
+    billCents = 0; answerCents = 0; shift = 0;
+    billInput.value = ''; answerInput.value = '';
+    clearVerdict(); render();
+  });
 
-  // Row + pill selection.
-  function setTarget(t){ target = t; clearVerdict(); render(); }
-  rowBill.addEventListener('click',   () => setTarget('bill'));
-  rowResult.addEventListener('click', () => setTarget('result'));
-  pickBill.addEventListener('click',   e => { e.stopPropagation(); setTarget('bill'); });
-  pickResult.addEventListener('click', e => { e.stopPropagation(); setTarget('result'); });
-
-  // Hardware keyboard support too.
+  // ---- Keyboard niceties --------------------------------------------
+  // Arrow keys slide the decimal whenever an input isn't focused.
   window.addEventListener('keydown', e => {
-    if (e.key >= '0' && e.key <= '9'){ pushDigit(parseInt(e.key,10)); e.preventDefault(); }
-    else if (e.key === 'Backspace'){ backspace(); e.preventDefault(); }
-    else if (e.key === 'Escape'){ clearTarget(); }
-    else if (e.key === 'ArrowLeft'){ shiftLeft();  e.preventDefault(); }
-    else if (e.key === 'ArrowRight'){ shiftRight(); e.preventDefault(); }
-    else if (e.key === 'Enter'){ check(); e.preventDefault(); }
-    else if (e.key === 'Tab'){ setTarget(target === 'bill' ? 'result' : 'bill'); e.preventDefault(); }
+    const inField = document.activeElement === billInput
+                 || document.activeElement === answerInput;
+    if (inField) return;
+    if (e.key === 'ArrowLeft'){ shift += 1; clearVerdict(); render(); e.preventDefault(); }
+    if (e.key === 'ArrowRight'){ shift -= 1; clearVerdict(); render(); e.preventDefault(); }
+    if (e.key === 'Enter'){ document.getElementById('check').click(); }
   });
 
   render();

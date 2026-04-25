@@ -42,6 +42,20 @@
     font-size:1.4rem;font-weight:700;color:var(--accent2)}
   .lhs-op.plus{color:var(--accent)}
   .lhs-op.eq{color:var(--accent3)}
+
+  /* Tiny header tag above row 1 — names the row without taking row width. */
+  .row-tag{
+    color:var(--muted);font-size:.72rem;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;
+    margin:2px 0 4px 24px}
+
+  /* Phase break between row 1 (the bill) and row 2 (the shifted version). */
+  .step-break{
+    display:flex;align-items:center;gap:10px;
+    margin:12px 0;color:var(--muted);
+    font-size:.74rem;letter-spacing:.16em;text-transform:uppercase}
+  .step-break::before, .step-break::after{
+    content:"";flex:1;height:1px;background:var(--line)}
   .cells{display:flex;gap:var(--gap);align-items:center;flex:1;justify-content:flex-start}
   .cell{
     width:var(--cell-w);height:var(--cell-h);
@@ -93,8 +107,8 @@
 <main>
   <h1>Quick Tip</h1>
   <p class="lede">
-    Type the bill. Slide the decimal one place to make 10%. Add the two 10% rows
-    yourself, type your answer, hit <b>Check</b>.
+    Type the total. Move the decimal one place to the left to make 10%.
+    Add the two 10% rows yourself, then check your answer.
   </p>
 
   <section class="panel">
@@ -107,9 +121,15 @@
 
     <div class="stack" aria-label="Calculation grid">
       <!-- Row 1: bill -->
+      <div class="row-tag">total</div>
       <div class="row">
         <div class="lhs-op">&nbsp;</div>
         <div class="cells" id="cells-bill"></div>
+      </div>
+
+      <!-- Phase break: clear visual cue that the user now slides the decimal -->
+      <div class="step-break" aria-hidden="true">
+        <span>move the decimal now</span>
       </div>
 
       <!-- Row 2: shifted (10%) — slide control sits at row's end -->
@@ -169,7 +189,7 @@
   let shift = 0;
 
   const INT_SLOTS = 5;   // visible integer cells (room to grow)
-  const DEC_SLOTS = 4;   // visible decimal cells (room for shifts)
+  const DEC_SLOTS = 2;   // visible decimal cells — anything beyond is wasted
 
   // ---- DOM -----------------------------------------------------------
   const billInput   = document.getElementById('bill-input');
@@ -203,7 +223,8 @@
     const naturalPos = int.length;
     const newPos = Math.max(0, naturalPos - decShift);
     const newInt = all.slice(0, newPos);
-    const newDec = all.slice(newPos);
+    // Cap visible decimal digits at DEC_SLOTS — overflow is dropped, by design.
+    const newDec = all.slice(newPos, newPos + DEC_SLOTS);
 
     const intPad = INT_SLOTS - newInt.length;
     for (let i=0;i<intPad;i++) host.appendChild(makeCell('', true, false));
@@ -263,11 +284,13 @@
   });
 
   // ---- Check ---------------------------------------------------------
-  // Truth = sum of the two shifted rows.
-  // shifted_value_in_cents = billCents * 10^(-shift).  Round to nearest cent.
+  // Truth = sum of what's actually shown in the two shifted rows.
+  // Each shifted row is rounded to the nearest cent (DEC_SLOTS = 2), so
+  // the expected sum is twice that displayed cent value — i.e. "what you
+  // see is what you add."
   function expectedCents(){
-    const shifted = billCents * Math.pow(10, -shift);
-    return Math.round(shifted * 2);
+    const displayedShiftedCents = Math.round(billCents * Math.pow(10, -shift));
+    return 2 * displayedShiftedCents;
   }
   function fmt(cents){
     const sign = cents < 0 ? '-' : '';

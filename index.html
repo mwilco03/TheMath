@@ -100,7 +100,16 @@
   .verdict.show{display:block}
   .verdict.ok{background:var(--good-bg);border:1px solid var(--good);color:var(--good)}
   .verdict.no{background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
-  .hint{color:var(--muted);font-size:.8rem;margin-top:8px;line-height:1.45}
+  .why{color:var(--muted);font-size:.85rem;margin-top:14px;line-height:1.5}
+  .why summary{
+    cursor:pointer;color:var(--ink);font-weight:600;font-size:.9rem;
+    padding:6px 0;list-style:none}
+  .why summary::-webkit-details-marker{display:none}
+  .why summary::before{
+    content:"▸";display:inline-block;margin-right:8px;color:var(--accent2);
+    transition:transform .15s}
+  .why[open] summary::before{transform:rotate(90deg)}
+  .why p{margin:6px 0}
 </style>
 </head>
 <body>
@@ -170,10 +179,23 @@
     </div>
 
     <div class="verdict" id="verdict"></div>
-    <div class="hint">
-      One <b>←</b> press = decimal moves one place left = 10% of the bill.
-      Two 10% rows added together = a 20% tip.
-    </div>
+
+    <details class="why">
+      <summary>Why this works</summary>
+      <p>
+        Multiplying a number by <b>10</b> shifts every digit one column to the
+        <em>left</em>. Multiplying by <b>0.1</b> shifts every digit one column
+        to the <em>right</em> — and that's exactly what 10% of the number
+        looks like. To get a <b>20% tip</b>, write the 10% row twice and add
+        them. For <b>15%</b>, take the midpoint between the bill's 10% and
+        20% rows (or halve 10% and add it to 10%).
+      </p>
+      <p>
+        The grid here drops anything past two decimal places by design — that
+        last cent rounded off doesn't matter when you're standing at the
+        register, and the lesson stays clean: <em>slide once, double, done.</em>
+      </p>
+    </details>
   </section>
 </main>
 
@@ -284,13 +306,18 @@
   });
 
   // ---- Check ---------------------------------------------------------
-  // Truth = sum of what's actually shown in the two shifted rows.
-  // Each shifted row is rounded to the nearest cent (DEC_SLOTS = 2), so
-  // the expected sum is twice that displayed cent value — i.e. "what you
-  // see is what you add."
+  // Truth = sum of what's actually shown in the two shifted rows. Because
+  // the renderer TRUNCATES decimal digits past DEC_SLOTS (matching the
+  // "slide the decimal" visual — same digits, just moved), expectedCents
+  // must also truncate so "what you see is what you add."
   function expectedCents(){
-    const displayedShiftedCents = Math.round(billCents * Math.pow(10, -shift));
-    return 2 * displayedShiftedCents;
+    const all = String(billCents).padStart(3, '0');         // e.g. "5075"
+    const naturalPos = all.length - 2;                       // 2
+    const newPos = Math.max(0, naturalPos - shift);
+    const newInt = all.slice(0, newPos) || '0';
+    const newDec = all.slice(newPos, newPos + DEC_SLOTS).padEnd(DEC_SLOTS, '0');
+    const shownCents = parseInt(newInt + newDec, 10);
+    return 2 * shownCents;
   }
   function fmt(cents){
     const sign = cents < 0 ? '-' : '';

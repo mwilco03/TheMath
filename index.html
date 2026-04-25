@@ -3,280 +3,419 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Quick Tip — the mirror &amp; slide trick</title>
+<title>Quick Tip — practice grid</title>
 <style>
   :root{
-    --bg:#0f1226;
-    --panel:#171a35;
-    --ink:#eaecff;
-    --muted:#9aa3d6;
-    --accent:#7ee787;
-    --accent2:#ffd166;
-    --accent3:#8ab4ff;
-    --line:#2a2f5a;
-    --cell:#1f2447;
-    --cell-shift:#243059;
-    --cell-sum:#2a4732;
+    --bg:#0f1226; --panel:#171a35; --ink:#eaecff; --muted:#9aa3d6;
+    --accent:#7ee787; --accent2:#ffd166; --accent3:#8ab4ff;
+    --line:#2a2f5a; --cell:#1f2447; --cell-active:#293063;
+    --bad:#ff6b6b; --bad-bg:#3a1a1f; --good:#7ee787; --good-bg:#1a3a22;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  main{max-width:920px;margin:0 auto;padding:32px 20px 80px}
-  h1{margin:0 0 6px;font-weight:700;letter-spacing:.2px}
-  p.lede{color:var(--muted);margin:0 0 22px}
+  main{max-width:880px;margin:0 auto;padding:28px 16px 80px}
+  h1{margin:0 0 4px}
+  p.lede{color:var(--muted);margin:0 0 18px}
   .panel{background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:22px;margin:18px 0}
-  label{display:block;color:var(--muted);font-size:.92rem;margin-bottom:8px}
-  .input-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  input[type="number"]{
-    background:#0a0d22;color:var(--ink);border:1px solid var(--line);
-    border-radius:10px;padding:12px 14px;font-size:1.25rem;width:200px;
+    border-radius:14px;padding:20px;margin:14px 0}
+  .row{
+    display:flex;align-items:center;gap:6px;margin:10px 0;
     font-variant-numeric:tabular-nums}
-  input[type="number"]:focus{outline:2px solid var(--accent3);border-color:transparent}
-  .chip{
-    background:#0a0d22;border:1px solid var(--line);border-radius:999px;
-    padding:8px 12px;color:var(--muted);font-size:.9rem}
-  .chip b{color:var(--ink)}
-  /* Grid */
-  .grid-wrap{overflow-x:auto;padding:6px 2px}
-  .grid{
-    display:grid;grid-auto-flow:column;grid-auto-columns:48px;
-    gap:6px;align-items:center;justify-content:start;
-    font-variant-numeric:tabular-nums;
-  }
-  .row{display:contents}
-  .label-cell{
-    grid-column:1;grid-row:auto;color:var(--muted);font-size:.82rem;
-    padding-right:10px;text-align:right;min-width:170px;white-space:nowrap}
+  .row-label{
+    width:120px;color:var(--muted);font-size:.85rem;text-align:right;
+    padding-right:10px;flex-shrink:0}
+  .lhs-op{
+    width:28px;text-align:center;font-size:1.5rem;font-weight:700;
+    color:var(--accent2);flex-shrink:0}
+  .lhs-op.plus{color:var(--accent)}
+  .lhs-op.eq{color:var(--accent3)}
+  .cells{display:flex;gap:5px;align-items:center}
   .cell{
-    height:54px;display:flex;align-items:center;justify-content:center;
-    background:var(--cell);border:1px solid var(--line);border-radius:10px;
-    font-size:1.6rem;font-weight:600}
+    width:46px;height:54px;display:flex;align-items:center;justify-content:center;
+    background:var(--cell);border:1px solid var(--line);border-radius:9px;
+    font-size:1.55rem;font-weight:600;transition:background .15s,border-color .15s,color .15s}
   .cell.empty{background:transparent;border-style:dashed;color:var(--muted);font-weight:400}
-  .cell.dot{background:transparent;border:none;color:var(--accent2);font-size:1.8rem}
-  .cell.shift{background:var(--cell-shift);border-color:#3a4787;color:var(--accent3)}
-  .cell.sum{background:var(--cell-sum);border-color:#3e6a48;color:var(--accent)}
-  .op{
-    height:54px;display:flex;align-items:center;justify-content:center;
-    color:var(--accent2);font-size:1.6rem;font-weight:700}
-  .op.plus{color:var(--accent)}
-  .op.eq{color:var(--accent3)}
-  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:.92rem}
-  .legend span b{color:var(--ink)}
-  .arrow-row{
-    display:flex;align-items:center;gap:10px;margin:6px 0 0 180px;
-    color:var(--accent2);font-size:.95rem}
-  .arrow-row svg{flex:0 0 auto}
-  .totals{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:14px;margin-top:14px}
-  .total-card{
-    background:#0a0d22;border:1px solid var(--line);border-radius:12px;
-    padding:14px}
-  .total-card h3{margin:0 0 4px;font-size:.85rem;color:var(--muted);
-    text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-  .total-card .val{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
-  .total-card.t10 .val{color:var(--accent3)}
-  .total-card.t20 .val{color:var(--accent)}
-  .total-card.t15 .val{color:var(--accent2)}
-  .total-card.grand .val{color:var(--ink)}
-  details{margin-top:18px;color:var(--muted)}
-  details summary{cursor:pointer;color:var(--ink)}
-  footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:30px}
-  a{color:var(--accent3)}
+  .cell.dot{
+    width:14px;background:transparent;border:none;color:var(--accent2);
+    font-size:1.9rem;font-weight:700}
+  .cell.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .cell.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .row.active .cells .cell:not(.dot){box-shadow:0 0 0 2px rgba(138,180,255,.25) inset}
+  .row.selectable{cursor:pointer}
+  .shift-btns{display:flex;gap:6px;margin-left:10px}
+  .shift-btns button{
+    width:42px;height:42px;border-radius:8px;border:1px solid var(--line);
+    background:#0a0d22;color:var(--ink);font-size:1.1rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .shift-btns button:hover{border-color:var(--accent3)}
+  .shift-btns button:active{transform:translateY(1px)}
+  .shift-tag{
+    margin-left:10px;font-size:.8rem;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .shift-tag.bad{color:var(--bad)}
+  .keypad{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+    max-width:300px;margin-top:6px}
+  .keypad button{
+    height:54px;border-radius:10px;border:1px solid var(--line);
+    background:#0a0d22;color:var(--ink);font-size:1.3rem;font-weight:600;
+    cursor:pointer}
+  .keypad button.util{color:var(--accent2);font-size:1rem}
+  .keypad button:hover{border-color:var(--accent3)}
+  .keypad button:active{transform:translateY(1px)}
+  .target-pick{display:flex;gap:8px;margin:10px 0 0;color:var(--muted);font-size:.9rem}
+  .target-pick button{
+    border:1px solid var(--line);background:#0a0d22;color:var(--ink);
+    border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+  .target-pick button.on{background:var(--accent3);color:#000;border-color:var(--accent3)}
+  .actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .check{
+    background:var(--accent3);color:#000;border:none;border-radius:10px;
+    padding:14px 22px;font-size:1.05rem;font-weight:700;cursor:pointer}
+  .check:hover{filter:brightness(1.05)}
+  .reset{
+    background:transparent;color:var(--muted);border:1px solid var(--line);
+    border-radius:10px;padding:14px 18px;font-weight:600;cursor:pointer}
+  .verdict{
+    margin-top:12px;padding:12px 14px;border-radius:10px;font-weight:600;
+    display:none}
+  .verdict.show{display:block}
+  .verdict.ok{background:var(--good-bg);border:1px solid var(--good);color:var(--good)}
+  .verdict.no{background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
+  .hint{color:var(--muted);font-size:.85rem;margin-top:8px}
   @media (max-width:640px){
-    .label-cell{min-width:120px;font-size:.75rem}
-    .arrow-row{margin-left:130px}
-    .grid{grid-auto-columns:40px}
-    .cell,.op{height:46px;font-size:1.35rem}
+    .row-label{width:90px;font-size:.75rem}
+    .cell{width:38px;height:46px;font-size:1.25rem}
+    .cell.dot{width:12px;font-size:1.5rem}
   }
 </style>
 </head>
 <body>
 <main>
-  <h1>Quick Tip — the mirror &amp; slide trick</h1>
+  <h1>Quick Tip — practice grid</h1>
   <p class="lede">
-    Drop the bill into the grid. Mirror it down a row, slide it right by one cell
-    (that's <b>×&nbsp;0.1</b> — your 10%). Mirror that row again and add the two:
-    you've got the 20% tip with grade-school arithmetic.
+    Type the bill. Slide the decimal to make 10%. Add the two 10% rows yourself.
+    Hit <b>Check</b>.
   </p>
 
   <section class="panel">
-    <label for="bill">Bill total</label>
-    <div class="input-row">
-      <input id="bill" type="number" inputmode="decimal" step="0.01" min="0"
-             value="48.50" aria-label="Bill total in dollars" />
-      <span class="chip">Try: <b>23.40</b>, <b>112.75</b>, <b>9.99</b></span>
+    <!-- Row 1: Bill total (user types) -->
+    <div class="row selectable active" id="row-bill" data-target="bill">
+      <div class="row-label">Place total here</div>
+      <div class="lhs-op">&nbsp;</div>
+      <div class="cells" id="cells-bill"></div>
+    </div>
+
+    <!-- Row 2: Mirror with shift buttons -->
+    <div class="row" id="row-shift">
+      <div class="row-label">Mirror &amp; slide</div>
+      <div class="lhs-op">&nbsp;</div>
+      <div class="cells" id="cells-shift"></div>
+      <div class="shift-btns">
+        <button id="btn-left"  title="Slide decimal left  (×0.1)">←</button>
+        <button id="btn-right" title="Slide decimal right (×10)">→</button>
+      </div>
+      <div class="shift-tag" id="shift-tag">×1</div>
+    </div>
+
+    <!-- Row 3: + and another mirror of row 2 -->
+    <div class="row" id="row-mirror">
+      <div class="row-label">Mirror it again</div>
+      <div class="lhs-op plus">+</div>
+      <div class="cells" id="cells-mirror"></div>
+    </div>
+
+    <!-- divider -->
+    <div class="row" aria-hidden="true">
+      <div class="row-label">&nbsp;</div>
+      <div class="lhs-op">&nbsp;</div>
+      <div class="cells">
+        <div style="height:2px;background:var(--line);width:100%;min-width:260px"></div>
+      </div>
+    </div>
+
+    <!-- Row 4: User result -->
+    <div class="row selectable" id="row-result" data-target="result">
+      <div class="row-label">Your answer</div>
+      <div class="lhs-op eq">=</div>
+      <div class="cells" id="cells-result"></div>
+    </div>
+
+    <div class="target-pick">
+      Typing into:
+      <button class="on" id="pick-bill"   data-target="bill">Bill</button>
+      <button         id="pick-result" data-target="result">Your answer</button>
+    </div>
+
+    <!-- Keypad -->
+    <div class="keypad" aria-label="Number pad">
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button class="util" data-k="back">⌫</button>
+      <button data-k="0">0</button>
+      <button class="util" data-k="clear">CLR</button>
+    </div>
+
+    <div class="actions">
+      <button class="check" id="check">Check</button>
+      <button class="reset" id="reset">Reset</button>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+    <div class="hint">
+      Tip: one press of <b>←</b> shifts the decimal one place — that's 10% of the
+      bill. Add the two 10% rows together to get a 20% tip.
     </div>
   </section>
-
-  <section class="panel">
-    <div class="grid-wrap">
-      <div id="grid" class="grid" role="table" aria-label="Tip calculation grid"></div>
-    </div>
-
-    <div class="legend">
-      <span><b style="color:var(--accent2)">·</b> decimal point</span>
-      <span><b style="color:var(--accent3)">cell</b> shifted (×0.1 → 10%)</span>
-      <span><b style="color:var(--accent)">+ / =</b> add the mirrored rows</span>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="totals">
-      <div class="total-card t10">
-        <h3>10% — slide once</h3><div class="val" id="v10">$4.85</div>
-      </div>
-      <div class="total-card t20">
-        <h3>20% — mirror &amp; add</h3><div class="val" id="v20">$9.70</div>
-      </div>
-      <div class="total-card t15">
-        <h3>15% — average of bill rows</h3><div class="val" id="v15">$7.28</div>
-      </div>
-      <div class="total-card grand">
-        <h3>Total + 20% tip</h3><div class="val" id="vGrand">$58.20</div>
-      </div>
-    </div>
-
-    <details>
-      <summary>Why this works</summary>
-      <p>
-        Multiplying by 10 shifts every digit one column to the <em>left</em>.
-        Multiplying by <b>0.1</b> shifts every digit one column to the <em>right</em>
-        — that's exactly what 10% of a number looks like. To get 20%, mirror that
-        10% row and add the two; column-by-column addition gives the tip without a
-        calculator. For 15%, take the halfway point between the 10% row and the 20% row.
-      </p>
-    </details>
-  </section>
-
-  <footer>
-    Built as a single static page — open <code>index.html</code> or serve via GitHub Pages.
-  </footer>
 </main>
 
 <script>
 (function(){
-  const billEl = document.getElementById('bill');
-  const grid   = document.getElementById('grid');
-  const v10    = document.getElementById('v10');
-  const v20    = document.getElementById('v20');
-  const v15    = document.getElementById('v15');
-  const vGrand = document.getElementById('vGrand');
+  // ---- State ----------------------------------------------------------
+  // Bill is stored as an integer count of cents being entered right-to-left.
+  // billCents = digits typed, treated as the number * 100.
+  // shift = how many places the decimal has been moved LEFT from its
+  // natural position in row 2. shift > 1 (or < 0) is "too many" -> red.
+  // resultCents = user's answer for row 4, also right-to-left entry.
+  let billCents   = 0;     // raw entered digits, max 9 digits
+  let resultCents = 0;     // raw entered digits, max 9 digits
+  let shift       = 0;     // 0 = identical to bill; 1 = ×0.1 (10%)
+  let target      = 'bill';// which row receives keypad input
 
-  // Format currency with two decimals.
-  const money = n => '$' + (Math.round(n*100)/100).toFixed(2);
+  const MAX_DIGITS = 9;    // total digits entered (incl. cents)
+  const INT_SLOTS  = 5;    // visible integer cells
+  const DEC_SLOTS  = 4;    // visible decimal cells (room for shifts)
 
-  // Break a non-negative number into digit slots aligned around a fixed
-  // decimal column. We always render two decimal places.
-  // Returns { intDigits: [...], decDigits: [d,d] }
-  function digitize(n){
-    if (!isFinite(n) || n < 0) n = 0;
-    const fixed = (Math.round(n*100)/100).toFixed(2);
-    const [intPart, decPart] = fixed.split('.');
-    return {
-      intDigits: intPart.split(''),
-      decDigits: decPart.split('')
-    };
+  // ---- DOM refs -------------------------------------------------------
+  const cellsBill   = document.getElementById('cells-bill');
+  const cellsShift  = document.getElementById('cells-shift');
+  const cellsMirror = document.getElementById('cells-mirror');
+  const cellsResult = document.getElementById('cells-result');
+  const shiftTag    = document.getElementById('shift-tag');
+  const verdict     = document.getElementById('verdict');
+  const rowBill     = document.getElementById('row-bill');
+  const rowResult   = document.getElementById('row-result');
+  const pickBill    = document.getElementById('pick-bill');
+  const pickResult  = document.getElementById('pick-result');
+
+  // ---- Helpers --------------------------------------------------------
+  // Convert a raw digit count (e.g. 5075) into the display digits
+  // distributed across (INT_SLOTS + DEC_SLOTS) cells, with the decimal
+  // point fixed between them.  Cents are the last 2 digits.
+  function digitsFromCents(cents){
+    const s = String(cents).padStart(3, '0'); // at least 1 int digit + 2 dec
+    const dec = s.slice(-2);
+    const int = s.slice(0, -2);
+    return { int, dec };
   }
 
-  // Build a row of cells aligned to a shared column layout.
-  // columns: array of column descriptors
-  //   { type:'digit'|'dot', d?:string }
-  // We render cells across `colCount` columns; missing entries are empty cells.
-  function makeRow(label, cells, opts={}){
-    const labelDiv = document.createElement('div');
-    labelDiv.className = 'label-cell';
-    labelDiv.textContent = label;
-    grid.appendChild(labelDiv);
-    cells.forEach(c => {
-      const el = document.createElement('div');
-      if (c.type === 'dot'){
-        el.className = 'cell dot';
-        el.textContent = '·';
-      } else if (c.type === 'op'){
-        el.className = 'op ' + (c.cls||'');
-        el.textContent = c.sym;
-      } else if (c.type === 'empty'){
-        el.className = 'cell empty';
-        el.textContent = '';
-      } else {
-        el.className = 'cell' + (opts.shift ? ' shift':'') + (opts.sum ? ' sum':'');
-        el.textContent = c.d;
-      }
-      grid.appendChild(el);
+  // Render a row of cells.  `int` and `dec` are digit strings.  `decShift`
+  // moves the decimal point that many positions to the LEFT inside this
+  // row's display (positive = ×0.1^n).  `flagBad` marks all digit cells red.
+  function renderRow(host, int, dec, decShift, flagBad){
+    host.innerHTML = '';
+
+    // Combine into one digit stream, then re-split based on the shifted
+    // decimal position. The natural decimal sits between int and dec.
+    const all = int + dec;            // e.g. "5075"
+    const naturalPos = int.length;    // index where '.' sits naturally
+    const newPos = Math.max(0, naturalPos - decShift); // shift LEFT
+
+    const newInt = all.slice(0, newPos);
+    const newDec = all.slice(newPos);
+
+    // Pad integer cells to INT_SLOTS on the left (empty cells).
+    const intPad = INT_SLOTS - newInt.length;
+    for (let i=0;i<intPad;i++){
+      host.appendChild(makeCell('', true, false));
+    }
+    for (const d of newInt){
+      host.appendChild(makeCell(d, false, flagBad));
+    }
+    // Decimal point.
+    const dot = document.createElement('div');
+    dot.className = 'cell dot';
+    dot.textContent = '·';
+    host.appendChild(dot);
+    // Decimal cells, padded on the right.
+    for (const d of newDec){
+      host.appendChild(makeCell(d, false, flagBad));
+    }
+    const decPad = DEC_SLOTS - newDec.length;
+    for (let i=0;i<decPad;i++){
+      host.appendChild(makeCell('', true, false));
+    }
+  }
+
+  function makeCell(ch, empty, bad){
+    const el = document.createElement('div');
+    el.className = 'cell' + (empty ? ' empty' : '') + (bad ? ' bad' : '');
+    el.textContent = ch;
+    return el;
+  }
+
+  function render(){
+    const bill = digitsFromCents(billCents);
+    const res  = digitsFromCents(resultCents);
+
+    // Row 1 — bill, no shift.
+    renderRow(cellsBill, bill.int, bill.dec, 0, false);
+
+    // Row 2 + 3 — same shifted bill. shift==1 is the "right" target;
+    // anything else is flagged red but still calculated.
+    const flagBad = (shift !== 1);
+    renderRow(cellsShift,  bill.int, bill.dec, shift, flagBad);
+    renderRow(cellsMirror, bill.int, bill.dec, shift, flagBad);
+
+    // Row 4 — user's typed answer, no shift.
+    renderRow(cellsResult, res.int, res.dec, 0, false);
+
+    // Shift readout: ×1, ×0.1, ×0.01, ×10, etc.
+    const factor = Math.pow(10, -shift);
+    const tag = shift === 0 ? '×1'
+              : shift > 0   ? '×' + (factor === 0.1 ? '0.1' : factor.toFixed(shift))
+              :               '×' + Math.pow(10, -shift);
+    shiftTag.textContent = tag;
+    shiftTag.classList.toggle('bad', flagBad);
+
+    // Active row highlight.
+    rowBill.classList.toggle('active',   target === 'bill');
+    rowResult.classList.toggle('active', target === 'result');
+    pickBill.classList.toggle('on',   target === 'bill');
+    pickResult.classList.toggle('on', target === 'result');
+  }
+
+  // ---- Input ----------------------------------------------------------
+  function pushDigit(d){
+    clearVerdict();
+    if (target === 'bill'){
+      if (String(billCents).length >= MAX_DIGITS) return;
+      billCents = billCents * 10 + d;
+    } else {
+      if (String(resultCents).length >= MAX_DIGITS) return;
+      resultCents = resultCents * 10 + d;
+    }
+    render();
+  }
+  function backspace(){
+    clearVerdict();
+    if (target === 'bill'){
+      billCents = Math.floor(billCents / 10);
+    } else {
+      resultCents = Math.floor(resultCents / 10);
+    }
+    render();
+  }
+  function clearTarget(){
+    clearVerdict();
+    if (target === 'bill'){ billCents = 0; }
+    else { resultCents = 0; }
+    render();
+  }
+
+  // ---- Shift ----------------------------------------------------------
+  function shiftLeft(){  clearVerdict(); shift += 1; render(); }
+  function shiftRight(){ clearVerdict(); shift -= 1; render(); }
+
+  // ---- Check ----------------------------------------------------------
+  // Truth: the shifted row's value, doubled.  We compute it in cents to
+  // avoid float drift.  shifted_cents = round(billCents * 10^(-shift)).
+  function expectedCents(){
+    // billCents represents bill * 100.
+    // shifted_value = bill * 10^(-shift)
+    // shifted_value_in_cents = billCents * 10^(-shift)
+    // Doubled (the sum of two mirrored rows) = 2 * shifted_value_in_cents.
+    // We round to nearest cent because shifting can produce sub-cent values
+    // (e.g. shift=2 on $50.75 -> $0.5075 -> $0.51 rounded).
+    const shifted = billCents * Math.pow(10, -shift);
+    return Math.round(shifted * 2);
+  }
+
+  function check(){
+    if (billCents === 0){
+      showVerdict(false, 'Type the bill first.');
+      return;
+    }
+    const want = expectedCents();
+    if (resultCents === want){
+      showVerdict(true, `Correct — ${fmt(want)} is the sum of those two rows.`);
+      flashRow(cellsResult, true);
+    } else {
+      showVerdict(false,
+        `Not yet. The two rows above sum to ${fmt(want)}. ` +
+        (shift !== 1
+          ? 'Hint: one ← press makes the row 10% of the bill — that gives a 20% tip.'
+          : 'Re-add the columns and try again.'));
+      flashRow(cellsResult, false);
+    }
+  }
+
+  function fmt(cents){
+    const sign = cents < 0 ? '-' : '';
+    cents = Math.abs(cents);
+    const whole = Math.floor(cents / 100);
+    const frac  = String(cents % 100).padStart(2,'0');
+    return `${sign}$${whole}.${frac}`;
+  }
+
+  function showVerdict(ok, msg){
+    verdict.textContent = msg;
+    verdict.className = 'verdict show ' + (ok ? 'ok' : 'no');
+  }
+  function clearVerdict(){
+    verdict.className = 'verdict';
+    // Clear good/bad flashes on result cells.
+    [...cellsResult.children].forEach(c => c.classList.remove('good','bad'));
+  }
+  function flashRow(host, ok){
+    [...host.children].forEach(c => {
+      if (c.classList.contains('dot') || c.classList.contains('empty')) return;
+      c.classList.add(ok ? 'good' : 'bad');
     });
   }
 
-  // Render the full calculation grid for the given bill amount.
-  function render(){
-    const bill = parseFloat(billEl.value);
-    const safe = isFinite(bill) && bill >= 0 ? bill : 0;
-
-    // Layout columns: we need enough integer columns to fit (bill) and
-    // (bill * 1.2) — the 10% shift adds one integer column on the left.
-    const billDig = digitize(safe);
-    const tenDig  = digitize(safe * 0.1);
-    const twentyDig = digitize(safe * 0.2);
-
-    // Determine total integer-column width (max int length across rows).
-    const intWidth = Math.max(billDig.intDigits.length,
-                              tenDig.intDigits.length,
-                              twentyDig.intDigits.length,
-                              1);
-
-    // Helper: produce cells for a row given its digit object,
-    // padded to intWidth integer columns + dot + 2 decimal columns.
-    function rowCells(dig){
-      const cells = [];
-      const pad = intWidth - dig.intDigits.length;
-      for (let i=0;i<pad;i++) cells.push({type:'empty'});
-      dig.intDigits.forEach(d => cells.push({type:'digit', d}));
-      cells.push({type:'dot'});
-      dig.decDigits.forEach(d => cells.push({type:'digit', d}));
-      return cells;
-    }
-
-    // Set column count on the grid.
-    const colCount = intWidth + 1 /*dot*/ + 2 /*decimals*/ + 1 /*op col*/;
-    grid.style.gridTemplateColumns =
-      `170px repeat(${colCount-1}, 48px)`;
-
-    // Clear and build.
-    grid.innerHTML = '';
-
-    // Row 1 — Bill total.
-    makeRow('Bill total', [
-      ...rowCells(billDig),
-      {type:'op', sym:'', cls:''}
-    ]);
-
-    // Row 2 — Mirror of bill, slid right by one column (×0.1 → 10%).
-    makeRow('Mirror, slide → ×0.1  (10%)',
-      rowCells(tenDig).concat([{type:'op', sym:'', cls:''}]),
-      {shift:true});
-
-    // Row 3 — Mirror of the 10% row (same value).
-    makeRow('Mirror it again  (10%)',
-      rowCells(tenDig).concat([{type:'op', sym:'+', cls:'plus'}]),
-      {shift:true});
-
-    // Row 4 — Sum: add the two 10% rows column by column → 20% tip.
-    makeRow('Add the rows  =  20% tip',
-      rowCells(twentyDig).concat([{type:'op', sym:'=', cls:'eq'}]),
-      {sum:true});
-
-    // Update totals.
-    const tip10 = safe * 0.10;
-    const tip20 = safe * 0.20;
-    const tip15 = (tip10 + tip20) / 2;
-    v10.textContent    = money(tip10);
-    v20.textContent    = money(tip20);
-    v15.textContent    = money(tip15);
-    vGrand.textContent = money(safe + tip20);
+  // ---- Reset ----------------------------------------------------------
+  function resetAll(){
+    billCents = 0; resultCents = 0; shift = 0; target = 'bill';
+    clearVerdict();
+    render();
   }
 
-  billEl.addEventListener('input', render);
+  // ---- Wire up --------------------------------------------------------
+  document.querySelectorAll('.keypad button').forEach(b => {
+    b.addEventListener('click', () => {
+      const k = b.dataset.k;
+      if (k === 'back')  return backspace();
+      if (k === 'clear') return clearTarget();
+      pushDigit(parseInt(k,10));
+    });
+  });
+
+  document.getElementById('btn-left').addEventListener('click',  shiftLeft);
+  document.getElementById('btn-right').addEventListener('click', shiftRight);
+  document.getElementById('check').addEventListener('click', check);
+  document.getElementById('reset').addEventListener('click', resetAll);
+
+  // Row + pill selection.
+  function setTarget(t){ target = t; clearVerdict(); render(); }
+  rowBill.addEventListener('click',   () => setTarget('bill'));
+  rowResult.addEventListener('click', () => setTarget('result'));
+  pickBill.addEventListener('click',   e => { e.stopPropagation(); setTarget('bill'); });
+  pickResult.addEventListener('click', e => { e.stopPropagation(); setTarget('result'); });
+
+  // Hardware keyboard support too.
+  window.addEventListener('keydown', e => {
+    if (e.key >= '0' && e.key <= '9'){ pushDigit(parseInt(e.key,10)); e.preventDefault(); }
+    else if (e.key === 'Backspace'){ backspace(); e.preventDefault(); }
+    else if (e.key === 'Escape'){ clearTarget(); }
+    else if (e.key === 'ArrowLeft'){ shiftLeft();  e.preventDefault(); }
+    else if (e.key === 'ArrowRight'){ shiftRight(); e.preventDefault(); }
+    else if (e.key === 'Enter'){ check(); e.preventDefault(); }
+    else if (e.key === 'Tab'){ setTarget(target === 'bill' ? 'result' : 'bill'); e.preventDefault(); }
+  });
+
   render();
 })();
 </script>
